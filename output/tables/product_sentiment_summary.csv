@@ -1,0 +1,16 @@
+product_name,product_category,review_count,average_rating,average_compound_score,positive_percentage,negative_percentage,average_word_count
+Designing Data-Intensive Applications,Books,19,3.58,0.3577,63.16,15.79,30.2
+AromaBreeze Stainless Steel Espresso Maker,Home and Kitchen,18,3.78,0.4874,83.33,16.67,32.9
+PureAir HEPA Room Air Purifier,Home and Kitchen,17,2.94,0.3198,64.71,23.53,30.9
+SilkTouch Ceramic Hair Straightener,Beauty and Personal Care,14,3.64,0.6318,92.86,7.14,33.1
+ProGamer Wireless Mechanical Keyboard,Electronics,14,4.0,0.5553,78.57,14.29,29.9
+HydroFlow Insulated Stainless Water Bottle,Sports and Outdoors,14,3.71,0.3808,71.43,21.43,31.7
+ChefMaster 8-Piece Japanese Knife Set,Home and Kitchen,14,4.0,0.5892,85.71,14.29,32.7
+Vision4K Smart Streaming Dongle,Electronics,14,3.57,0.7446,100.0,0.0,32.4
+UltraClean Noise-Cancelling Headphones,Electronics,13,3.0,0.1963,61.54,30.77,28.2
+HydraGlow Hyaluronic Acid Facial Serum,Beauty and Personal Care,13,4.31,0.7083,92.31,7.69,34.7
+ApexFit Resistance Band Training Set,Sports and Outdoors,12,3.25,0.3699,75.0,16.67,30.6
+The Pragmatic Programmer: 20th Anniversary,Books,11,3.64,0.4437,63.64,9.09,32.8
+Botanical Herbals Rejuvenating Night Cream,Beauty and Personal Care,11,3.55,0.4026,54.55,9.09,31.5
+Data Science from Scratch (2nd Edition),Books,9,3.67,0.3919,66.67,22.22,32.9
+TrailBlazer Lightweight Trekking Poles,Sports and Outdoors,8,4.5,0.6122,87.5,0.0,30.4

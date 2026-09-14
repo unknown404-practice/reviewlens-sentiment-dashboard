@@ -1,0 +1,706 @@
+<div id="app" class="rl-app">
+  <!-- Top Header Navigation & Status -->
+  <header class="rl-header">
+    <div class="rl-header-left">
+      <div class="rl-brand">
+        <span class="rl-logo-icon">🔎</span>
+        <div class="rl-brand-text">
+          <h1 class="rl-title">ReviewLens</h1>
+          <span class="rl-subtitle">E-Commerce Review Sentiment Intelligence</span>
+        </div>
+      </div>
+      <div class="rl-header-badges">
+        <span class="rl-badge rl-badge-cyan">VADER-Powered</span>
+        <span class="rl-badge rl-badge-muted">Local Demo Data + API Analysis</span>
+      </div>
+    </div>
+
+    <div class="rl-header-right">
+      <div id="api-status-container" class="rl-status-indicator checking" role="status" aria-live="polite">
+        <span class="rl-status-dot"></span>
+        <span id="api-status-text" class="rl-status-label">Checking API…</span>
+      </div>
+      <button id="btn-refresh-dashboard" class="rl-btn rl-btn-secondary rl-btn-sm" title="Refresh dashboard data">
+        <span class="rl-btn-icon">🔄</span> Refresh
+      </button>
+    </div>
+  </header>
+
+  <!-- Navigation Tab Bar -->
+  <nav class="rl-nav" role="tablist" aria-label="Dashboard views">
+    <button id="tab-btn-overview" class="rl-tab-btn active" role="tab" aria-selected="true" aria-controls="panel-overview">
+      <span class="rl-tab-icon">📊</span> Overview
+    </button>
+    <button id="tab-btn-analyze" class="rl-tab-btn" role="tab" aria-selected="false" aria-controls="panel-analyze">
+      <span class="rl-tab-icon">✍️</span> Analyze Text
+    </button>
+    <button id="tab-btn-explore" class="rl-tab-btn" role="tab" aria-selected="false" aria-controls="panel-explore">
+      <span class="rl-tab-icon">📑</span> Explore Reviews
+    </button>
+    <button id="tab-btn-insights" class="rl-tab-btn" role="tab" aria-selected="false" aria-controls="panel-insights">
+      <span class="rl-tab-icon">💡</span> Insights
+    </button>
+    <button id="tab-btn-url" class="rl-tab-btn" role="tab" aria-selected="false" aria-controls="panel-url">
+      <span class="rl-tab-icon">🌐</span> URL Analysis
+    </button>
+    <button id="tab-btn-about" class="rl-tab-btn" role="tab" aria-selected="false" aria-controls="panel-about">
+      <span class="rl-tab-icon">ℹ️</span> About
+    </button>
+  </nav>
+
+  <!-- Main Content Panels -->
+  <main class="rl-main">
+
+    <!-- ===================================================================== -->
+    <!-- TAB 1: OVERVIEW                                                       -->
+    <!-- ===================================================================== -->
+    <section id="panel-overview" class="rl-tab-panel active" role="tabpanel" aria-labelledby="tab-btn-overview">
+      <!-- Hero Banner -->
+      <div class="rl-hero-card">
+        <div class="rl-hero-content">
+          <h2 class="rl-hero-title">Turn customer reviews into clear sentiment intelligence.</h2>
+          <p class="rl-hero-subtitle">Explore processed local review data, analyze new feedback with VADER, and identify product-level sentiment patterns.</p>
+          <div class="rl-hero-actions">
+            <button id="btn-hero-analyze" class="rl-btn rl-btn-primary">
+              <span>✍️ Analyze Review Text</span>
+            </button>
+            <button id="btn-hero-insights" class="rl-btn rl-btn-secondary">
+              <span>💡 Explore Demo Insights</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Offline / Error Banner (Hidden by default) -->
+      <div id="overview-error-banner" class="rl-alert rl-alert-error" style="display: none;">
+        <div class="rl-alert-content">
+          <strong>FastAPI Backend Offline:</strong> The ReviewLens REST service is not reachable at the configured address.
+          Please verify that the backend is running (`launch_dashboard_api.bat` or `uvicorn backend.main:app`).
+        </div>
+        <button id="btn-retry-connection" class="rl-btn rl-btn-sm rl-btn-outline">Retry Connection</button>
+      </div>
+
+      <!-- KPI Metrics Grid -->
+      <h3 class="rl-section-title">Core Sentiment Metrics</h3>
+      <div id="kpi-grid" class="rl-kpi-grid">
+        <div class="rl-kpi-card loading" id="kpi-total">
+          <span class="rl-kpi-label">Total Reviews</span>
+          <span class="rl-kpi-value">—</span>
+          <span class="rl-kpi-subtext">Processed dataset records</span>
+        </div>
+        <div class="rl-kpi-card rl-kpi-pos loading" id="kpi-pos">
+          <span class="rl-kpi-label">Positive Reviews</span>
+          <span class="rl-kpi-value">—</span>
+          <span class="rl-kpi-subtext">—</span>
+        </div>
+        <div class="rl-kpi-card rl-kpi-neu loading" id="kpi-neu">
+          <span class="rl-kpi-label">Neutral Reviews</span>
+          <span class="rl-kpi-value">—</span>
+          <span class="rl-kpi-subtext">—</span>
+        </div>
+        <div class="rl-kpi-card rl-kpi-neg loading" id="kpi-neg">
+          <span class="rl-kpi-label">Negative Reviews</span>
+          <span class="rl-kpi-value">—</span>
+          <span class="rl-kpi-subtext">—</span>
+        </div>
+        <div class="rl-kpi-card loading" id="kpi-compound">
+          <span class="rl-kpi-label">Avg. Compound Score</span>
+          <span class="rl-kpi-value">—</span>
+          <span class="rl-kpi-subtext">VADER normalized scale [-1 to +1]</span>
+        </div>
+        <div class="rl-kpi-card loading" id="kpi-rating">
+          <span class="rl-kpi-label">Average Star Rating</span>
+          <span class="rl-kpi-value">—</span>
+          <span class="rl-kpi-subtext">Out of 5.0 stars</span>
+        </div>
+        <div class="rl-kpi-card loading" id="kpi-match">
+          <span class="rl-kpi-label">Rating–Sentiment Match</span>
+          <span class="rl-kpi-value">—</span>
+          <span class="rl-kpi-subtext">Rating aligns with VADER score</span>
+        </div>
+      </div>
+
+      <!-- Visual Sentiment Distribution Bar -->
+      <div class="rl-card rl-dist-card">
+        <div class="rl-card-header">
+          <h3 class="rl-card-title">Sentiment Distribution</h3>
+          <span class="rl-badge rl-badge-muted">3-Class VADER Classification</span>
+        </div>
+        <div class="rl-card-body">
+          <div id="sentiment-dist-bar" class="rl-dist-bar-container">
+            <div id="dist-bar-pos" class="rl-dist-segment rl-dist-pos" style="width: 33.3%;">
+              <span class="rl-dist-label">Positive</span>
+            </div>
+            <div id="dist-bar-neu" class="rl-dist-segment rl-dist-neu" style="width: 33.3%;">
+              <span class="rl-dist-label">Neutral</span>
+            </div>
+            <div id="dist-bar-neg" class="rl-dist-segment rl-dist-neg" style="width: 33.4%;">
+              <span class="rl-dist-label">Negative</span>
+            </div>
+          </div>
+          <div id="sentiment-dist-legend" class="rl-dist-legend">
+            <div class="rl-legend-item"><span class="rl-legend-dot pos"></span> Positive: <strong id="legend-pos-val">—</strong></div>
+            <div class="rl-legend-item"><span class="rl-legend-dot neu"></span> Neutral: <strong id="legend-neu-val">—</strong></div>
+            <div class="rl-legend-item"><span class="rl-legend-dot neg"></span> Negative: <strong id="legend-neg-val">—</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Insight Highlights -->
+      <h3 class="rl-section-title">Quick Intelligence Highlights</h3>
+      <div id="quick-insights-grid" class="rl-quick-grid">
+        <div class="rl-card rl-insight-card" id="qi-best-cat">
+          <span class="rl-insight-icon">🏆</span>
+          <div class="rl-insight-info">
+            <span class="rl-insight-label">Highest Sentiment Category</span>
+            <span class="rl-insight-val" id="qi-best-cat-val">Loading…</span>
+            <span class="rl-insight-sub" id="qi-best-cat-sub">Evaluating categories…</span>
+          </div>
+        </div>
+        <div class="rl-card rl-insight-card" id="qi-lowest-cat">
+          <span class="rl-insight-icon">⚠️</span>
+          <div class="rl-insight-info">
+            <span class="rl-insight-label">Lowest Sentiment Category</span>
+            <span class="rl-insight-val" id="qi-lowest-cat-val">Loading…</span>
+            <span class="rl-insight-sub" id="qi-lowest-cat-sub">Evaluating categories…</span>
+          </div>
+        </div>
+        <div class="rl-card rl-insight-card" id="qi-top-product">
+          <span class="rl-insight-icon">📦</span>
+          <div class="rl-insight-info">
+            <span class="rl-insight-label">Most Reviewed Product</span>
+            <span class="rl-insight-val" id="qi-top-product-val">Loading…</span>
+            <span class="rl-insight-sub" id="qi-top-product-sub">Checking review volume…</span>
+          </div>
+        </div>
+        <div class="rl-card rl-insight-card rl-insight-card-info" id="qi-provenance">
+          <span class="rl-insight-icon">🔒</span>
+          <div class="rl-insight-info">
+            <span class="rl-insight-label">Dataset Provenance</span>
+            <span class="rl-insight-val" id="qi-data-mode-val">Local Demo Mode</span>
+            <span class="rl-insight-sub" id="qi-data-mode-sub">Processed synthetic benchmark dataset</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 2: ANALYZE TEXT                                                   -->
+    <!-- ===================================================================== -->
+    <section id="panel-analyze" class="rl-tab-panel" role="tabpanel" aria-labelledby="tab-btn-analyze" hidden>
+      <div class="rl-card">
+        <div class="rl-card-header">
+          <div>
+            <h2 class="rl-card-title">Real-Time VADER Sentiment Analyzer</h2>
+            <p class="rl-card-desc">Type or paste customer feedback to compute instant polarity, valence proportions, and intensity tiers via the FastAPI endpoint.</p>
+          </div>
+          <span class="rl-badge rl-badge-cyan">VADER Scoring</span>
+        </div>
+
+        <div class="rl-card-body">
+          <div class="rl-form-group">
+            <label for="analyze-text-input" class="rl-label">Customer Review Text</label>
+            <textarea
+              id="analyze-text-input"
+              class="rl-textarea"
+              rows="5"
+              maxlength="5000"
+              placeholder="Example: The product quality is excellent, packaging was secure, and delivery was faster than expected."
+            ></textarea>
+            <div class="rl-textarea-footer">
+              <span class="rl-hint">Supports up to 5,000 characters. Evaluated securely in-memory.</span>
+              <span id="char-counter" class="rl-char-counter">0 / 5000</span>
+            </div>
+          </div>
+
+          <div class="rl-action-row">
+            <button id="btn-analyze-submit" class="rl-btn rl-btn-primary">
+              <span>⚡ Analyze Sentiment</span>
+            </button>
+            <button id="btn-analyze-clear" class="rl-btn rl-btn-secondary">
+              <span>Clear</span>
+            </button>
+            <div class="rl-preset-buttons">
+              <span class="rl-preset-label">Sample Presets:</span>
+              <button class="rl-preset-btn" data-preset="positive">Positive</button>
+              <button class="rl-preset-btn" data-preset="neutral">Neutral</button>
+              <button class="rl-preset-btn" data-preset="negative">Negative</button>
+            </div>
+          </div>
+
+          <div id="analyze-error-container" class="rl-alert rl-alert-error" style="display: none;"></div>
+
+          <!-- Analysis Result Presentation Card -->
+          <div id="analyze-result-card" class="rl-result-card" style="display: none;">
+            <div class="rl-result-header">
+              <div class="rl-result-badges">
+                <span id="result-label-badge" class="rl-badge rl-badge-lg">—</span>
+                <span id="result-strength-badge" class="rl-badge rl-badge-muted rl-badge-lg">—</span>
+              </div>
+              <div class="rl-compound-box">
+                <span class="rl-compound-title">Compound Score</span>
+                <span id="result-compound-val" class="rl-compound-val">—</span>
+              </div>
+            </div>
+
+            <!-- Valence Scores Grid -->
+            <div class="rl-valence-grid">
+              <div class="rl-valence-item">
+                <div class="rl-valence-meta">
+                  <span class="rl-valence-title">Positive Valence</span>
+                  <span id="val-pos-num" class="rl-valence-num">0.000</span>
+                </div>
+                <div class="rl-meter-bar">
+                  <div id="val-pos-meter" class="rl-meter-fill pos" style="width: 0%;"></div>
+                </div>
+              </div>
+              <div class="rl-valence-item">
+                <div class="rl-valence-meta">
+                  <span class="rl-valence-title">Neutral Valence</span>
+                  <span id="val-neu-num" class="rl-valence-num">0.000</span>
+                </div>
+                <div class="rl-meter-bar">
+                  <div id="val-neu-meter" class="rl-meter-fill neu" style="width: 0%;"></div>
+                </div>
+              </div>
+              <div class="rl-valence-item">
+                <div class="rl-valence-meta">
+                  <span class="rl-valence-title">Negative Valence</span>
+                  <span id="val-neg-num" class="rl-valence-num">0.000</span>
+                </div>
+                <div class="rl-meter-bar">
+                  <div id="val-neg-meter" class="rl-meter-fill neg" style="width: 0%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Human Readable Interpretation -->
+            <div class="rl-interpretation-box">
+              <span class="rl-interp-icon">💡</span>
+              <p id="result-interpretation" class="rl-interp-text">—</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 3: EXPLORE REVIEWS                                                -->
+    <!-- ===================================================================== -->
+    <section id="panel-explore" class="rl-tab-panel" role="tabpanel" aria-labelledby="tab-btn-explore" hidden>
+      <div class="rl-card">
+        <div class="rl-card-header">
+          <div>
+            <h2 class="rl-card-title">Enriched Reviews Explorer</h2>
+            <p class="rl-card-desc">Filter, search, and paginate through customer feedback analyzed during the pipeline stages.</p>
+          </div>
+          <span id="explore-total-badge" class="rl-badge rl-badge-cyan">Total: 0</span>
+        </div>
+
+        <div class="rl-card-body">
+          <!-- Filter Controls Bar -->
+          <div class="rl-filter-bar">
+            <div class="rl-filter-group rl-filter-search">
+              <label for="filter-search-input" class="rl-label-sm">Search Reviews</label>
+              <input
+                id="filter-search-input"
+                type="text"
+                class="rl-input"
+                placeholder="Search text, title, product name…"
+              />
+            </div>
+
+            <div class="rl-filter-group">
+              <label for="filter-sentiment-select" class="rl-label-sm">Sentiment</label>
+              <select id="filter-sentiment-select" class="rl-select">
+                <option value="">All Sentiments</option>
+                <option value="Positive">Positive</option>
+                <option value="Neutral">Neutral</option>
+                <option value="Negative">Negative</option>
+              </select>
+            </div>
+
+            <div class="rl-filter-group">
+              <label for="filter-category-select" class="rl-label-sm">Category</label>
+              <select id="filter-category-select" class="rl-select">
+                <option value="">All Categories</option>
+              </select>
+            </div>
+
+            <div class="rl-filter-group">
+              <label for="filter-product-select" class="rl-label-sm">Product</label>
+              <select id="filter-product-select" class="rl-select">
+                <option value="">All Products</option>
+              </select>
+            </div>
+
+            <div class="rl-filter-group">
+              <label for="filter-sort-select" class="rl-label-sm">Sort By</label>
+              <select id="filter-sort-select" class="rl-select">
+                <option value="newest">Newest Date</option>
+                <option value="highest_sentiment">Highest Sentiment</option>
+                <option value="lowest_sentiment">Lowest Sentiment</option>
+                <option value="highest_rating">Highest Rating</option>
+                <option value="helpful">Most Helpful</option>
+              </select>
+            </div>
+
+            <div class="rl-filter-group rl-filter-pagesize">
+              <label for="filter-limit-select" class="rl-label-sm">Page Size</label>
+              <select id="filter-limit-select" class="rl-select">
+                <option value="10">10</option>
+                <option value="20" selected>20</option>
+                <option value="50">50</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Loading Indicator -->
+          <div id="reviews-loading" class="rl-loading-state" style="display: none;">
+            <div class="rl-spinner"></div>
+            <span>Loading reviews from API…</span>
+          </div>
+
+          <!-- Reviews Grid Container -->
+          <div id="reviews-list-container" class="rl-reviews-grid">
+            <!-- Dynamic review cards are inserted here safely using DOM creation -->
+          </div>
+
+          <!-- Empty State -->
+          <div id="reviews-empty-state" class="rl-empty-state" style="display: none;">
+            <span class="rl-empty-icon">🔍</span>
+            <h4 class="rl-empty-title">No reviews match the current filters</h4>
+            <p class="rl-empty-desc">Try loosening your search query, selecting another category, or clearing the sentiment filter.</p>
+            <button id="btn-clear-filters" class="rl-btn rl-btn-sm rl-btn-secondary">Clear All Filters</button>
+          </div>
+
+          <!-- Pagination Bar -->
+          <div class="rl-pagination-bar">
+            <button id="btn-page-prev" class="rl-btn rl-btn-secondary rl-btn-sm" disabled>
+              ← Previous
+            </button>
+            <span id="pagination-info" class="rl-page-info">Page 1 of 1</span>
+            <button id="btn-page-next" class="rl-btn rl-btn-secondary rl-btn-sm" disabled>
+              Next →
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 4: INSIGHTS                                                       -->
+    <!-- ===================================================================== -->
+    <section id="panel-insights" class="rl-tab-panel" role="tabpanel" aria-labelledby="tab-btn-insights" hidden>
+      <!-- Category Sentiment Horizontal Bar Chart -->
+      <div class="rl-card">
+        <div class="rl-card-header">
+          <div>
+            <h2 class="rl-card-title">Category Sentiment Ranking</h2>
+            <p class="rl-card-desc">Average VADER compound score across commercial product categories.</p>
+          </div>
+          <span class="rl-badge rl-badge-cyan">Category Benchmarks</span>
+        </div>
+        <div class="rl-card-body">
+          <div id="category-ranking-chart" class="rl-chart-container">
+            <!-- Rendered with pure HTML/CSS bars -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Category Summary Table -->
+      <div class="rl-card">
+        <div class="rl-card-header">
+          <h3 class="rl-card-title">Category Intelligence Breakdown</h3>
+          <span class="rl-badge rl-badge-muted">Aggregated Metrics</span>
+        </div>
+        <div class="rl-card-body">
+          <div class="rl-table-responsive">
+            <table class="rl-table" id="table-category-analytics">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Review Count</th>
+                  <th>Avg. Rating</th>
+                  <th>Avg. Sentiment</th>
+                  <th>Positive %</th>
+                  <th>Negative %</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-category-analytics">
+                <tr><td colspan="6" class="rl-td-center">Loading category analytics…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product Analytics Table -->
+      <div class="rl-card">
+        <div class="rl-card-header">
+          <h3 class="rl-card-title">Product Intelligence Breakdown</h3>
+          <span class="rl-badge rl-badge-muted">Product-Level Scoring</span>
+        </div>
+        <div class="rl-card-body">
+          <div class="rl-table-responsive">
+            <table class="rl-table" id="table-product-analytics">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Category</th>
+                  <th>Review Count</th>
+                  <th>Avg. Rating</th>
+                  <th>Avg. Sentiment</th>
+                  <th>Positive %</th>
+                  <th>Negative %</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-product-analytics">
+                <tr><td colspan="7" class="rl-td-center">Loading product analytics…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Positive and Negative Reviews Section -->
+      <div class="rl-columns-grid">
+        <!-- Top Positive Reviews -->
+        <div class="rl-card">
+          <div class="rl-card-header">
+            <h3 class="rl-card-title">🌟 Top Positive Reviews</h3>
+            <span class="rl-badge rl-badge-pos">Highest Compound</span>
+          </div>
+          <div class="rl-card-body">
+            <div id="top-positive-container" class="rl-top-reviews-list">
+              <span class="rl-hint">Loading top positive reviews…</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top Negative Reviews -->
+        <div class="rl-card">
+          <div class="rl-card-header">
+            <h3 class="rl-card-title">⚠️ Top Negative Reviews</h3>
+            <span class="rl-badge rl-badge-neg">Lowest Compound</span>
+          </div>
+          <div class="rl-card-body">
+            <div id="top-negative-container" class="rl-top-reviews-list">
+              <span class="rl-hint">Loading top negative reviews…</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rl-card rl-insight-disclaimer-card">
+        <span class="rl-hint">
+          ℹ️ These insights are calculated from the project's processed local dataset. They are not a live marketplace-wide sentiment report.
+        </span>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 5: URL ANALYSIS                                                   -->
+    <!-- ===================================================================== -->
+    <section id="panel-url" class="rl-tab-panel" role="tabpanel" aria-labelledby="tab-btn-url" hidden>
+      <div class="rl-card">
+        <div class="rl-card-header">
+          <div>
+            <h2 class="rl-card-title">Public Review URL Analysis</h2>
+            <p class="rl-card-desc">Extract and score customer reviews from configured and permitted public review pages.</p>
+          </div>
+          <span class="rl-badge rl-badge-muted">Controlled Endpoint</span>
+        </div>
+
+        <div class="rl-card-body">
+          <div class="rl-alert rl-alert-info">
+            <div class="rl-alert-content">
+              <strong>Responsible Scraping Policy:</strong> URL analysis is intentionally restricted. ReviewLens only supports sources explicitly configured and permitted by the backend. It does not bypass login pages, CAPTCHAs, bot protections, rate limits, or website restrictions.
+            </div>
+          </div>
+
+          <div class="rl-form-group">
+            <label for="url-target-input" class="rl-label">Target Review Page URL</label>
+            <input
+              id="url-target-input"
+              type="url"
+              class="rl-input"
+              placeholder="https://example.com/products/item-review-page"
+            />
+            <span class="rl-hint">Must be a valid HTTP or HTTPS public URL. Internal and private network IP addresses are blocked.</span>
+          </div>
+
+          <div class="rl-form-row">
+            <div class="rl-form-group" style="max-width: 240px;">
+              <label for="url-max-reviews" class="rl-label">Max Reviews to Extract</label>
+              <select id="url-max-reviews" class="rl-select">
+                <option value="10">10 Reviews</option>
+                <option value="20" selected>20 Reviews</option>
+                <option value="50">50 Reviews (Max)</option>
+              </select>
+            </div>
+            <div class="rl-form-actions">
+              <button id="btn-submit-url" class="rl-btn rl-btn-primary">
+                <span>🔍 Analyze URL</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- URL Extraction Status Area -->
+          <div id="url-status-area" class="rl-url-status-box" style="display: none;">
+            <div id="url-status-message"></div>
+          </div>
+
+          <!-- URL Results Grid -->
+          <div id="url-results-container" class="rl-reviews-grid" style="display: none;"></div>
+
+          <div class="rl-url-fallback-card">
+            <p class="rl-hint">Want to test without external websites?</p>
+            <button id="btn-switch-to-demo" class="rl-btn rl-btn-secondary rl-btn-sm">
+              <span>Explore Local Demo Data Instead</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 6: ABOUT                                                          -->
+    <!-- ===================================================================== -->
+    <section id="panel-about" class="rl-tab-panel" role="tabpanel" aria-labelledby="tab-btn-about" hidden>
+      <div class="rl-card">
+        <div class="rl-card-header">
+          <div>
+            <h2 class="rl-card-title">About ReviewLens Intelligence Platform</h2>
+            <p class="rl-card-desc">Architecture, VADER methodology, data ethics, and engineering specifications.</p>
+          </div>
+          <span class="rl-badge rl-badge-cyan">Architecture & Governance</span>
+        </div>
+
+        <div class="rl-card-body rl-about-content">
+          <div class="rl-about-section">
+            <h3 class="rl-about-heading">1. What is ReviewLens?</h3>
+            <p>ReviewLens is an enterprise-grade NLP sentiment intelligence platform designed to ingest e-commerce customer reviews, perform data quality auditing and text cleaning, extract granular linguistic features, and execute rule-based sentiment analytics. It bridges exploratory data science into production microservices and executive reporting dashboards.</p>
+          </div>
+
+          <div class="rl-about-section">
+            <h3 class="rl-about-heading">2. End-to-End Architecture</h3>
+            <div class="rl-arch-flow">
+              <div class="rl-arch-step">
+                <span class="rl-arch-num">01</span>
+                <strong>Data Pipeline</strong>
+                <span>Jupyter notebooks, schema validation, synthetic generator, text sanitization.</span>
+              </div>
+              <div class="rl-arch-arrow">→</div>
+              <div class="rl-arch-step">
+                <span class="rl-arch-num">02</span>
+                <strong>VADER Engine</strong>
+                <span>Polarity scores, 3-class classification, 5-tier intensity segmentation.</span>
+              </div>
+              <div class="rl-arch-arrow">→</div>
+              <div class="rl-arch-step">
+                <span class="rl-arch-num">03</span>
+                <strong>FastAPI Service</strong>
+                <span>Typed Pydantic endpoints, in-memory caching, anti-SSRF checks, SlowAPI limits.</span>
+              </div>
+              <div class="rl-arch-arrow">→</div>
+              <div class="rl-arch-step">
+                <span class="rl-arch-num">04</span>
+                <strong>Streamlit Dashboard</strong>
+                <span>Vanilla HTML/CSS/JS frontend embedded in a responsive Streamlit iframe.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="rl-about-section">
+            <h3 class="rl-about-heading">3. VADER Score Interpretation Thresholds</h3>
+            <p>VADER (Valence Aware Dictionary and sEntiment Reasoner) scores text by summing the lexical valence of each recognized token, adjusted by heuristical rules (punctuation, capitalization, negation, degree adverbs), normalized to a compound score between <code>-1.0</code> and <code>+1.0</code>.</p>
+            <div class="rl-threshold-table-wrapper">
+              <table class="rl-table rl-table-compact">
+                <thead>
+                  <tr>
+                    <th>Compound Score Range</th>
+                    <th>Sentiment Classification</th>
+                    <th>Granular Intensity Tier</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>compound &gt;= 0.60</code></td>
+                    <td><span class="rl-badge rl-badge-pos">Positive</span></td>
+                    <td>Strong Positive</td>
+                  </tr>
+                  <tr>
+                    <td><code>0.05 &lt;= compound &lt; 0.60</code></td>
+                    <td><span class="rl-badge rl-badge-pos">Positive</span></td>
+                    <td>Positive</td>
+                  </tr>
+                  <tr>
+                    <td><code>-0.05 &lt; compound &lt; 0.05</code></td>
+                    <td><span class="rl-badge rl-badge-neu">Neutral</span></td>
+                    <td>Neutral</td>
+                  </tr>
+                  <tr>
+                    <td><code>-0.60 &lt; compound &lt;= -0.05</code></td>
+                    <td><span class="rl-badge rl-badge-neg">Negative</span></td>
+                    <td>Negative</td>
+                  </tr>
+                  <tr>
+                    <td><code>compound &lt;= -0.60</code></td>
+                    <td><span class="rl-badge rl-badge-neg">Negative</span></td>
+                    <td>Strong Negative</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="rl-about-section">
+            <h3 class="rl-about-heading">4. Data Transparency & Ethical Collection</h3>
+            <p>The demonstration dataset provided with ReviewLens consists of deterministically generated synthetic customer reviews created using Python's pseudo-random number generator (<code>seed = 42</code>). It does <strong>not</strong> represent unpermitted scraped data from Amazon, Flipkart, or any third-party marketplace. ReviewLens adheres strictly to responsible web scraping guidelines: it operates only on permitted public endpoints and never bypasses authentication, CAPTCHAs, or rate limits.</p>
+          </div>
+
+          <div class="rl-about-section">
+            <h3 class="rl-about-heading">5. Methodological Limitations</h3>
+            <ul class="rl-about-list">
+              <li><strong>Social Lexicon Bias:</strong> VADER was calibrated on social media text; subtle hardware specifications or specialized vocabulary may produce skewed valence.</li>
+              <li><strong>Sarcasm and Subtlety:</strong> Complex conditional clauses or nuanced product trade-offs remain challenging for rule-based systems.</li>
+              <li><strong>Star Rating vs. Sentiment Disconnect:</strong> Polite customer language in 3-star reviews can trigger positive valence tokens despite mediocre satisfaction.</li>
+            </ul>
+          </div>
+
+          <div class="rl-about-section">
+            <h3 class="rl-about-heading">6. Technology Stack</h3>
+            <div class="rl-tech-badges">
+              <span class="rl-tech-badge">Python 3.12+</span>
+              <span class="rl-tech-badge">FastAPI</span>
+              <span class="rl-tech-badge">Pydantic v2</span>
+              <span class="rl-tech-badge">VADER Sentiment</span>
+              <span class="rl-tech-badge">Streamlit</span>
+              <span class="rl-tech-badge">Vanilla JavaScript</span>
+              <span class="rl-tech-badge">CSS Grid / Flexbox</span>
+              <span class="rl-tech-badge">SlowAPI</span>
+              <span class="rl-tech-badge">Playwright Ready</span>
+              <span class="rl-tech-badge">Pandas & NumPy</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Dashboard Footer -->
+  <footer class="rl-footer">
+    <div class="rl-footer-content">
+      <span>ReviewLens © 2026 — Production E-Commerce Review Sentiment Intelligence Dashboard</span>
+      <span class="rl-footer-links">
+        <a href="http://127.0.0.1:8000/docs" target="_blank" rel="noopener">FastAPI Swagger UI</a>
+        <span class="rl-dot-divider">•</span>
+        <a href="http://127.0.0.1:8000/redoc" target="_blank" rel="noopener">ReDoc Specs</a>
+        <span class="rl-dot-divider">•</span>
+        <a href="http://127.0.0.1:8000/health" target="_blank" rel="noopener">Health Endpoint</a>
+      </span>
+    </div>
+  </footer>
+</div>

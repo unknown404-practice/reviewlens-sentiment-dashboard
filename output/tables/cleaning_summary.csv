@@ -1,0 +1,7 @@
+Stage,Count,Percentage
+Raw Row Count,212,100.0%
+Fully Duplicated Rows Removed,2,0.94%
+Duplicate Text Rows Removed,3,1.42%
+Empty or Invalid Text Rows Removed,2,0.94%
+Invalid Ratings Removed,4,1.89%
+Final Retained Row Count,201,94.81%

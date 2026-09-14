@@ -1,0 +1,5 @@
+rating_group,Negative,Neutral,Positive,Total
+Negative,28,8,12,48
+Neutral,1,4,27,32
+Positive,0,7,114,121
+Total,29,19,153,201

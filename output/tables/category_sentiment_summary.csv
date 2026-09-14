@@ -1,0 +1,6 @@
+product_category,review_count,average_rating,average_compound_score,positive_percentage,negative_percentage
+Beauty and Personal Care,38,3.84,0.5916,81.58,7.89
+Electronics,41,3.54,0.5061,80.49,14.63
+Home and Kitchen,49,3.55,0.4584,77.55,18.37
+Sports and Outdoors,34,3.74,0.4314,76.47,14.71
+Books,39,3.62,0.3898,64.1,15.38
