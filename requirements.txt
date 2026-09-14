@@ -8,6 +8,8 @@ pytest
 fastapi
 uvicorn[standard]
 pydantic
+pydantic-settings
+beautifulsoup4
 python-dotenv
 httpx
 playwright
