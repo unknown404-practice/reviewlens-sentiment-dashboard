@@ -35,7 +35,11 @@ jobs:
           ENABLE_PLAYWRIGHT_SCRAPING: "false"
           ENVIRONMENT: "test"
         run: |
-          python -m pytest -v --tb=short
+          echo "### 🧪 Pytest Execution Results" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          set -o pipefail
+          python -m pytest -v --tb=short 2>&1 | tee -a $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
 
   frontend-build:
     name: Next.js Frontend Production Build
