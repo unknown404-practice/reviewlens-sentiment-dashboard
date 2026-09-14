@@ -160,10 +160,10 @@ python -m uvicorn backend.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
 ### Local URLs
-- **API Root**: [http://127.0.0.1:8000](http://127.0.0.1:8000)
-- **Health Check**: [http://127.0.0.1:8000/health](http://127.0.0.1:8000/health)
-- **Interactive OpenAPI Documentation (Swagger UI)**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-- **ReDoc Documentation**: [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
+- **API Root**: `http://127.0.0.1:8000`
+- **Health Check**: `http://127.0.0.1:8000/health`
+- **Interactive OpenAPI Documentation (Swagger UI)**: `http://127.0.0.1:8000/docs`
+- **ReDoc Documentation**: `http://127.0.0.1:8000/redoc`
 
 ---
 
@@ -387,13 +387,13 @@ To operate the complete ReviewLens platform, launch the services in this exact o
 ### 3. Running the Complete Stack
 
 #### Recommended: 1-Click Next.js + FastAPI Launcher
-Double-click [`launch_full_stack_next.bat`](file:///c:/Users/RANADEEP/Documents/reviewlens-sentiment-dashboard/launch_full_stack_next.bat) in the project root. It will:
+Double-click `launch_full_stack_next.bat` in the project root. It will:
 1. Start the FastAPI backend on `http://127.0.0.1:8000`.
 2. Wait 3 seconds for the API and SQLite database to initialize.
 3. Start the **Next.js Premium Frontend** on `http://localhost:3000` and open it directly in your browser.
 
 #### Alternative: 1-Click Streamlit Launcher
-Double-click [`launch_full_stack.bat`](file:///c:/Users/RANADEEP/Documents/reviewlens-sentiment-dashboard/launch_full_stack.bat) to launch the Streamlit frontend on `http://localhost:8501`.
+Double-click `launch_full_stack.bat` to launch the Streamlit frontend on `http://localhost:8501`.
 
 #### Manual Terminal Commands
 
@@ -416,12 +416,12 @@ npm run dev
 
 | Service | URL | Description |
 | :--- | :--- | :--- |
-| **Next.js Executive Dashboard** | [http://localhost:3000](http://localhost:3000) | Primary React/Next.js UI, Amazon extractor & SQLite history |
-| **Streamlit Dashboard** | [http://localhost:8501](http://localhost:8501) | Alternative lightweight Streamlit UI |
-| **FastAPI REST API** | [http://127.0.0.1:8000](http://127.0.0.1:8000) | Backend REST microservice root |
-| **FastAPI Swagger Docs** | [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) | Interactive OpenAPI testing console |
-| **FastAPI ReDoc** | [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc) | Clean API documentation specifications |
-| **Health Endpoint** | [http://127.0.0.1:8000/health](http://127.0.0.1:8000/health) | Operational status and environment check |
+| **Next.js Executive Dashboard** | `http://localhost:3000` | Primary React/Next.js UI, Amazon extractor & SQLite history |
+| **Streamlit Dashboard** | `http://localhost:8501` | Alternative lightweight Streamlit UI |
+| **FastAPI REST API** | `http://127.0.0.1:8000` | Backend REST microservice root |
+| **FastAPI Swagger Docs** | `http://127.0.0.1:8000/docs` | Interactive OpenAPI testing console |
+| **FastAPI ReDoc** | `http://127.0.0.1:8000/redoc` | Clean API documentation specifications |
+| **Health Endpoint** | `http://127.0.0.1:8000/health` | Operational status and environment check |
 
 ---
 
@@ -538,12 +538,12 @@ npm run dev
 #### Step 3: Verified Local URLs
 | Service | URL | Purpose | Status |
 | :--- | :--- | :--- | :--- |
-| **Next.js Frontend** | [http://localhost:3000](http://localhost:3000) | Primary responsive web application | Operational |
-| **FastAPI Backend Root** | [http://127.0.0.1:8000](http://127.0.0.1:8000) | Microservice welcome & version | Operational |
-| **FastAPI Health Check** | [http://127.0.0.1:8000/health](http://127.0.0.1:8000/health) | Health status JSON | Operational |
-| **FastAPI Swagger UI** | [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) | Interactive OpenAPI testing | Operational |
-| **FastAPI ReDoc UI** | [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc) | Clean API schema reference | Operational |
-| **Streamlit Dashboard** | [http://localhost:8501](http://localhost:8501) | Alternative UI fallback | Operational |
+| **Next.js Frontend** | `http://localhost:3000` | Primary responsive web application | Operational |
+| **FastAPI Backend Root** | `http://127.0.0.1:8000` | Microservice welcome & version | Operational |
+| **FastAPI Health Check** | `http://127.0.0.1:8000/health` | Health status JSON | Operational |
+| **FastAPI Swagger UI** | `http://127.0.0.1:8000/docs` | Interactive OpenAPI testing | Operational |
+| **FastAPI ReDoc UI** | `http://127.0.0.1:8000/redoc` | Clean API schema reference | Operational |
+| **Streamlit Dashboard** | `http://localhost:8501` | Alternative UI fallback | Operational |
 
 ---
 
@@ -622,7 +622,7 @@ Follow these steps in sequence to ensure zero-downtime deployment:
 2. **Step 2: Verify GitHub Actions CI**
    - Navigate to the **Actions** tab on GitHub and confirm that both `backend-tests` (pytest 67/67) and `frontend-build` (Next.js build) pass with green checks.
 3. **Step 3: Create Render Web Service**
-   - Sign in to [Render](https://render.com) and click **New + > Web Service**.
+   - Sign in to Render (`render.com`) and click **New + > Web Service**.
    - Connect your GitHub repository.
 4. **Step 4: Configure Render Service Settings**
    - Set Build Command: `pip install -r requirements.txt`
@@ -637,7 +637,7 @@ Follow these steps in sequence to ensure zero-downtime deployment:
    - Visit `https://<your-render-app>.onrender.com/health` in your browser. Confirm JSON response:
      `{"status":"ok","app_name":"ReviewLens Sentiment Dashboard API","version":"1.0.0","environment":"production"}`.
 7. **Step 7: Create Vercel Project**
-   - Sign in to [Vercel](https://vercel.com) and click **Add New... > Project**.
+   - Sign in to Vercel (`vercel.com`) and click **Add New... > Project**.
    - Import your GitHub repository.
    - Set **Root Directory** to `frontend-next`.
 8. **Step 8: Configure Vercel Environment Variables & Deploy**
