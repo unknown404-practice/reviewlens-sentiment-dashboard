@@ -14,16 +14,13 @@ DB_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(DB_DIR, "reviewlens.db")
 
 
-def get_db_connection() -> sqlite3.Connection:
-    os.makedirs(DB_DIR, exist_ok=True)
-    conn = sqlite3.connect(DB_PATH, timeout=15.0)
-    conn.row_factory = sqlite3.Row
-    return conn
+_SCHEMA_INITIALIZED = False
 
 
-def init_db(clear_dummy: bool = True) -> None:
-    """Initialize SQLite database schema for ReviewLens reviews."""
-    conn = get_db_connection()
+def _ensure_schema(conn: sqlite3.Connection) -> None:
+    global _SCHEMA_INITIALIZED
+    if _SCHEMA_INITIALIZED:
+        return
     try:
         with conn:
             conn.execute(
@@ -50,7 +47,27 @@ def init_db(clear_dummy: bool = True) -> None:
             conn.execute("CREATE INDEX IF NOT EXISTS idx_saved_source ON saved_reviews (source_type)")
             conn.execute("CREATE INDEX IF NOT EXISTS idx_saved_sentiment ON saved_reviews (sentiment_label)")
             conn.execute("CREATE INDEX IF NOT EXISTS idx_saved_created ON saved_reviews (created_at DESC)")
+        _SCHEMA_INITIALIZED = True
+    except Exception:
+        # Allow retry if schema creation fails
+        _SCHEMA_INITIALIZED = False
 
+
+def get_db_connection() -> sqlite3.Connection:
+    os.makedirs(DB_DIR, exist_ok=True)
+    conn = sqlite3.connect(DB_PATH, timeout=15.0)
+    conn.row_factory = sqlite3.Row
+    _ensure_schema(conn)
+    return conn
+
+
+def init_db(clear_dummy: bool = True) -> None:
+    """Initialize SQLite database schema for ReviewLens reviews."""
+    global _SCHEMA_INITIALIZED
+    _SCHEMA_INITIALIZED = False
+    conn = get_db_connection()
+    try:
+        with conn:
             if clear_dummy:
                 conn.execute("DELETE FROM saved_reviews WHERE source_type = 'dataset'")
     finally:
