@@ -35,11 +35,14 @@ jobs:
           ENABLE_PLAYWRIGHT_SCRAPING: "false"
           ENVIRONMENT: "test"
         run: |
-          echo "### 🧪 Pytest Execution Results" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          set -o pipefail
-          python -m pytest -v --tb=short 2>&1 | tee -a $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
+          python -m pytest -v --tb=short > pytest_report.txt 2>&1 || true
+          cat pytest_report.txt
+          fail_lines=$(grep -E "(FAILED|ERROR|=== FAILURES ===)" pytest_report.txt || true)
+          if [ -n "$fail_lines" ]; then
+            first_fail=$(grep -E "FAILED " pytest_report.txt | head -n 5 | tr '\n' ' ; ')
+            echo "::error title=Pytest Failures::$first_fail"
+            exit 1
+          fi
 
   frontend-build:
     name: Next.js Frontend Production Build
