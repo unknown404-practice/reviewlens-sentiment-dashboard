@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     HOST: str = Field(default="127.0.0.1", description="Host address for binding")
     PORT: int = Field(default=8000, description="Listening port number")
     ALLOWED_ORIGINS: Union[str, List[str]] = Field(
-        default="http://localhost:3000,http://127.0.0.1:3000,http://localhost:8501,http://127.0.0.1:8501,null",
+        default="https://reviewlens-sentiment-dashboard.vercel.app,http://localhost:3000,http://127.0.0.1:3000,http://localhost:8501,http://127.0.0.1:8501,null",
         description="Comma-separated list of permitted CORS origins",
     )
     MAX_REVIEWS_PER_REQUEST: int = Field(default=50, ge=1, le=500, description="Max reviews returned or processed per batch")

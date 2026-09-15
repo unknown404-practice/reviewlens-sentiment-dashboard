@@ -129,9 +129,10 @@ app.add_middleware(SlowAPIMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
+    allow_origin_regex=r"https?:\/\/(?:.*\.vercel\.app|localhost|127\.0\.0\.1)(?::\d+)?$",
     allow_credentials=False,
-    allow_methods=["GET", "POST", "OPTIONS"],
-    allow_headers=["Content-Type", "Accept"],
+    allow_methods=["GET", "POST", "DELETE", "OPTIONS", "HEAD"],
+    allow_headers=["*"],
 )
 
 

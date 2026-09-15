@@ -39,3 +39,34 @@ class TestApiHealth:
         assert data["service"] == settings.APP_NAME
         assert data["version"] == settings.APP_VERSION
         assert data["environment"] == settings.ENVIRONMENT
+
+    def test_cors_allowed_for_all_vercel_subdomains(self):
+        """Verify that any Vercel deployment hash or preview subdomain is allowed by CORS."""
+        test_origins = [
+            "https://reviewlens-sentiment-dashboard.vercel.app",
+            "https://reviewlens-sentiment-dashboard-dflx0ip3h-noteam02com.vercel.app",
+            "https://reviewlens-sentiment-dashboard-git-main-noteam02com.vercel.app",
+            "http://localhost:3000",
+            "http://127.0.0.1:3000",
+        ]
+        for origin in test_origins:
+            response = client.get("/health", headers={"Origin": origin})
+            assert response.status_code == 200
+            assert response.headers.get("access-control-allow-origin") == origin, (
+                f"Failed to allow origin: {origin}"
+            )
+
+    def test_cors_preflight_options_request(self):
+        """Verify CORS preflight OPTIONS request returns 200 and allowed methods."""
+        preview_origin = "https://reviewlens-sentiment-dashboard-dflx0ip3h-noteam02com.vercel.app"
+        response = client.options(
+            "/api/v1/analyze/text",
+            headers={
+                "Origin": preview_origin,
+                "Access-Control-Request-Method": "POST",
+                "Access-Control-Request-Headers": "Content-Type",
+            },
+        )
+        assert response.status_code == 200
+        assert response.headers.get("access-control-allow-origin") == preview_origin
+        assert "POST" in response.headers.get("access-control-allow-methods", "")
